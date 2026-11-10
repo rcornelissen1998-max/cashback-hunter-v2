@@ -89,7 +89,60 @@ document.getElementById('csv').addEventListener('change',async e=>{
   }
  });
  save();
- document.getElementById('message').textContent=added+' transacties ingelezen.';
+ document.getElementById('message') 
+function render(){
+ document.getElementById('total').textContent=money(
+  data.cashbacks.reduce((s,x)=>s+x.amount,0)
+ );
+
+ document.getElementById('cashbacks').innerHTML=
+  data.cashbacks.map(x=>
+   '<div class="item">'+x.shop+' — '+money(x.amount)+
+   ' <span class="small">Bevestigd</span></div>'
+  ).join('');
+
+ let q=document.getElementById('search').value.toLowerCase();
+ let list=data.transactions.filter(x=>x.shop.toLowerCase().includes(q));
+ let el=document.getElementById('stores');
+ el.innerHTML='';
+
+ if(!list.length){
+  el.textContent='Nog geen winkels gevonden.';
+  return;
+ }
+
+ list.forEach(x=>{
+  let s=x.shop.toLowerCase();
+  let tip='Controleer Woolsocks, ShopBuddies en Scoupy.';
+  if(s.includes('hema')) tip='Controleer Woolsocks en ShopBuddies.';
+  if(s.includes('bol.com')) tip='Controleer Woolsocks en ShopBuddies.';
+  if(s.includes('kruidvat')) tip='Controleer Woolsocks en ShopBuddies.';
+  if(s.includes('albert heijn')||s.includes('jumbo'))
+   tip='Controleer Scoupy voor actuele acties.';
+if(s.includes('dirk'))
+   tip='Bekijk de boodschappendeals bij Woolsocks en ShopBuddies. Scan je kassabon!';
+  let item=document.createElement('div');
+  item.className='item';
+
+  let name=document.createElement('b');
+  name.textContent=x.shop;
+
+  let amount=document.createElement('div');
+  amount.textContent=money(x.amount);
+
+  let status=document.createElement('div');
+  status.className='small';
+  status.textContent='Mogelijke cashback — nog niet bevestigd';
+
+  let advice=document.createElement('div');
+  advice.className='small';
+  advice.textContent='🔎 '+tip;
+
+  item.append(name,amount,status,advice);
+  el.appendChild(item);
+ });
+}
+
 });
 render();
 </script>
